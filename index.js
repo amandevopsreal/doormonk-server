@@ -17,8 +17,11 @@ const db = require('./DBConfig');
 
 
 
+
+
 app.get('/', (req, res) => {
-    res.json("everything is fine");
+    res.json("everything is working fine")
+
 })
 
 app.post("/signin", (req, res) => {
@@ -46,6 +49,9 @@ app.post("/signin", (req, res) => {
 
 app.post("/register", (req, res) => {
     const { name, email, password } = req.body;
+    if (!email || !name || !password) {
+        return res.status(400).json("Incorrect registration format.");
+    }
     const hash = bcrypt.hashSync(password);
     db.transaction(trx => {
         trx.insert({
@@ -71,6 +77,9 @@ app.post("/register", (req, res) => {
             .catch(trx.rollback)
 
     })
+        .catch(err => {
+            res.status(400).json('unable to register');
+        })
 });
 
 app.get("/:id", (req, res) => {
